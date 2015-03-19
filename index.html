@@ -9,17 +9,13 @@
   .interfacePanel {
     display:block;
     width:100%;
-    height:200px;
+    height:400px;
     position: relative;
     left:0;
       top: 50px;
   }
-  .interfaceCode {
-    width:50%;
-    float:left;
-  }
   #container {
-    width: 500px;
+    width: 800px;
   </style>
 </head>
 
@@ -46,23 +42,124 @@
 
   <a href='./docs/docs.html'>See the reference documentation</a>
   -->
-  <h2>Widgets</h2>
-      <div class="interfaceCode">
-        <h3>Button</h3>
+  <h1>Synths</h1>
+      <div id='buttonPanel1' class='interfacePanel'>
       </div>
-      <div id='buttonPanel' class='interfacePanel'>
+      <h2>Sine Generator</h2>
+      <p>Touch the buttons to produce various sine wave frequencies. 
+        <br/>
+         Move the 'attack' slider to manipulate the <em>ease-in</em> of the sound.
+        <br/>
+         Move the 'decay' slider to manupulate the <em>ease-out</em> of the sound.
+      </p>
+      
+      <div id='buttonPanel2' class='interfacePanel'>
       </div>
+      
+      <br/>
+      <br/>
+      
+      <h2>PolyFM Generator</h2> 
+      <p>Touch the buttons to produce various PolyFM frequencies. 
+        <br/>
+         Move the 'index' slider to manipulate the frequency index of the sound.
+        <br/>
+         Move the 'cmRatio' slider to manupulate the carrier-modulation ratio of the sound.
+      </p>
+      
+      <div id='buttonPanel3' class='interfacePanel'>
+      </div>
+      
+      <br/>
+      <br/>
+      
+      <h2>Pulse Wave Generator</h2>
+      <p>Toggle this synth on/off.
+        <br/>
+         You can adjust the volume with the 'amp' slider.
+        <br/>
+         Move the circles to generate different layered sound frequencies.
+        <br/>
+         The frequency level is determined along the y-axis.
+        <br/>
+         The 'filter cutoff' slider will set the limit of the frequency range.
+      </p>
       
       <script>          
       Gibberish.init();
-      //interface panel      
-      panel = new Interface.Panel({ container:document.querySelector("#buttonPanel") });
+      //interface panels      
+      panel1 = new Interface.Panel({ container:document.querySelector("#buttonPanel1") });
+      panel2 = new Interface.Panel({ container:document.querySelector("#buttonPanel2") });
+      panel3 = new Interface.Panel({ container:document.querySelector("#buttonPanel3") });
       //synths
       synth  = new Gibberish.Synth().connect();
       fm = new Gibberish.PolyFM({ maxVoices:5 })
       //effects
       delay = new Gibberish.Delay({ input:fm }).connect()
 
+          
+////////SYNTH 1 
+        button1 = new Interface.Button({
+          mode : 'contact',
+          max:440,
+          label:'440',
+          target:synth, key:'note',
+          bounds:[0,0,.5,.3],
+        })
+
+        button2 = new Interface.Button({
+          mode : 'contact',
+          max:880,
+          label:'880',
+          target:synth, key:'note',
+          bounds:[.5,0,.5,.3],
+        })
+
+        button3 = new Interface.Button({
+          mode : 'contact',
+          max:1320,
+          label:'1320',
+          target:synth, key:'note',
+          bounds:[0,.3,.5,.3],
+        })
+
+        button4 = new Interface.Button({
+          mode : 'contact',
+          max:507,
+          label:'507',
+          target:synth, key:'note',
+          bounds:[.5,.3,.5,.3],
+        })
+
+        sliderAttack = new Interface.Slider({
+          bounds:[0, .6, .5, .3],
+          label: 'attack',
+          isVertical:false,
+          min: 20, max: 44100,
+          target: synth, key:'attack'
+        })
+
+        sliderDecay = new Interface.Slider({
+          bounds:[.5, .6, .5, .3],
+          label: 'decay',      
+          isVertical:false,
+          min: 20, max: 44100,
+          target: synth, key:'decay'
+        })
+/*
+        sliderAmp = new Interface.Slider({
+          bounds:[0, .75, 1, .25],
+          label: 'amp',      
+          isVertical:false,
+          min: 0, max: 1,
+          target: synth, key:'amp'
+        })
+*/
+
+        panel1.add(button1,button2,button3,button4, sliderAttack, sliderDecay);
+      
+      
+////////SYNTH 2
         indexSlider = new Interface.Slider({
           target:fm,
           key:'index',
@@ -73,7 +170,7 @@
           bounds:[0,0,.5,.5]
         })
 
-        panel.add( indexSlider )
+        panel2.add( indexSlider )
 
         cmRatioSlider = new Interface.Slider({
           target:fm,
@@ -85,7 +182,7 @@
           bounds:[.5,0,.5,.5]
         })
 
-        panel.add( cmRatioSlider )
+        panel2.add( cmRatioSlider )
 
         btns = new Interface.MultiButton({
           rows:4, columns:4,
@@ -96,80 +193,65 @@
           bounds:[0,.5,1,.5]
         })
 
-        panel.add(btns)
+        panel2.add(btns)
 
-        panel.childFill = 'green'
+        panel2.childFill = 'green'
 
-          
-          /*
-        button1 = new Interface.Button({
-          mode : 'contact',
-          max:440,
-          label:'440',
-          target:synth, key:'note',
-          bounds:[0,0,.5,.25],
-        })
+////////SYNTH 3
+        pwms = [];
+        numChildren = 3;
 
-        button2 = new Interface.Button({
-          mode : 'contact',
-          max:880,
-          label:'880',
-          target:synth, key:'note',
-          bounds:[.5,0,.5,.25],
-        })
+        bus = new Gibberish.Bus2({amp:0});    
 
-        button3 = new Interface.Button({
-          mode : 'contact',
-          max:1320,
-          label:'1320',
-          target:synth, key:'note',
-          bounds:[0,.25,.5,.25],
-        })
+        for(var i =0; i < numChildren; i++) {
+          pwms[i] = new Gibberish.PWM(440).connect(bus);
+        }
 
-        button4 = new Interface.Button({
-          mode : 'contact',
-          max:507,
-          label:'507',
-          target:synth, key:'note',
-          bounds:[.5,.25,.5,.25],
-        })
+        filter = new Gibberish.Filter24(bus, .2, 3).connect();
 
-        sliderAttack = new Interface.Slider({
-          bounds:[0, .5, .5, .25],
-          label: 'attack',
-          isVertical:false,
-          min: 20, max: 44100,
-          target: synth, key:'attack'
-        })
+        d = new Interface.XY({ 
+          bounds:[0, 0, 1, .9],
+          'numChildren':numChildren,
+          fill:'rgba(127,80,80,.5)',
+          childWidth:35,
+          detectCollisions: false,
 
-        sliderDecay = new Interface.Slider({
-          bounds:[.5, .5, .5, .25],
-          label: 'decay',      
-          isVertical:false,
-          min: 20, max: 44100,
-          target: synth, key:'decay'
-        })
-
-        sliderAmp = new Interface.Slider({
-          bounds:[0, .75, .5, .25],
-          label: 'amp',      
-          isVertical:false,
-          min: 0, max: 1,
-          target: synth, key:'amp'
-        })
-
-        panel.add(button1,button2,button3,button4, sliderAttack, sliderDecay, sliderAmp);
-
-        /*      
-
-        Gibberish.init();
-
-        sampler = new Gibberish.Sampler({
-          file: "resources/snare.wav",
-          playOnLoad:0,
+          onvaluechange : function() {
+            for(var i =0; i < this.children.length; i++) {
+              var pwm = pwms[i];
+              pwm.frequency = 220 + this.values[i].y * 880;
+              pwm.pulsewidth = this.values[i].x;
+            }
+          },
         });
 
-        flanger = new Gibberish.Flanger({ input:sampler }).connect();   
+        e = new Interface.Slider({
+          isVertical: false,
+          label:'amp',
+          bounds:[0, .9, .4, .1],
+          target:bus, key:'amp'
+        });
+
+        f = new Interface.Slider({
+          isVertical: false,
+          label:'filter cutoff',
+          bounds:[.6, .9, .4, .1],  
+          onvaluechange : function(e) {
+            filter.cutoff = this.value * .75;
+          },
+        });
+          
+        g = new Interface.Button({ 
+                bounds:[.4, .9, .2, .1], 
+                target:bus, 
+                key:'amp',
+                label:'on / off' });  
+
+        panel3.add(d,e,f, g);
+
+        d.rainbow();  
+
+/*
         synth  = new Gibberish.Synth().connect();       
 
           !function() {
@@ -180,7 +262,7 @@
             //default button is "toggle"
             var b = new Interface.Button({ 
                 bounds:[.05,.20,.3,.3], 
-                target:flanger, 
+                target:synth, 
                 key:'rate',
                 label:'toggle' });
 
