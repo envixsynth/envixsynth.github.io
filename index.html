@@ -1,0 +1,211 @@
+<html>
+<head>
+  <title>Interface.js</title>
+  <script src="interface_scripts/interface.js"></script>
+  <script src="gibberish_scripts/gibberish.js"></script>
+  <script src="gibberish_scripts/synth_scripts/tests.js"></script>
+  
+  <style>
+  .interfacePanel {
+    display:block;
+    width:100%;
+    height:200px;
+    position: relative;
+    left:0;
+      top: 50px;
+  }
+  .interfaceCode {
+    width:50%;
+    float:left;
+  }
+  #container {
+    width: 500px;
+  </style>
+</head>
+
+<body>
+  <div id="container">
+<!--
+  <h1>Interface.js</h1>
+  <a href="https://github.com/charlieroberts/interface.js">Github Repo</a>
+  <p>Interface.js is a cross-platform library for touch, mouse and motion events oriented towards live performance.
+    The library can be used to control JavaScript objects in the same web page, but can also be used to control remote
+    applications using both MIDI and OSC using the included node.js script or the <a href="https://github.com/charlieroberts/interface.server">Interface.js Server application</a>.</p>
+    
+  <p>One goal of the library was to enable programmers to avoid having to place interface widgets using CSS and HTML; in
+    general I don't think using all three technologies together make sense for the types of performance oriented layouts this
+    library is intended for. As such, no knowledge of CSS is needed and a basic web page only needs html, head, body
+    and script tags in order to create a full-window interface. There is an <a href="https://github.com/charlieroberts/interface.editor">interface editor</a> for people who would like to visually design interfaces
+    that output MIDI and OSC instead of programming them in JavaScript.</p>
+    
+  <p>
+    Interface.js depends on <a href="http://zeptojs.com">zepto.js</a>; <a href="http://jquery.com">jQuery</a> can also be used. 
+    If you use Interface.js in conjunction with Interface.Server, Zepto will be loaded automatically upon including 
+    the interface.js script file in your html document.
+  </p>
+
+  <a href='./docs/docs.html'>See the reference documentation</a>
+  -->
+  <h2>Widgets</h2>
+      <div class="interfaceCode">
+        <h3>Button</h3>
+      </div>
+      <div id='buttonPanel' class='interfacePanel'>
+      </div>
+      
+      <script>          
+      Gibberish.init();
+      //interface panel      
+      panel = new Interface.Panel({ container:document.querySelector("#buttonPanel") });
+      //synths
+      synth  = new Gibberish.Synth().connect();
+      fm = new Gibberish.PolyFM({ maxVoices:5 })
+      //effects
+      delay = new Gibberish.Delay({ input:fm }).connect()
+
+        indexSlider = new Interface.Slider({
+          target:fm,
+          key:'index',
+          min:1,
+          max:50,
+          value:5,
+          label:'index',
+          bounds:[0,0,.5,.5]
+        })
+
+        panel.add( indexSlider )
+
+        cmRatioSlider = new Interface.Slider({
+          target:fm,
+          key:'cmRatio',
+          min:.25,
+          max:20,
+          value:3,
+          label:'cmRatio',
+          bounds:[.5,0,.5,.5]
+        })
+
+        panel.add( cmRatioSlider )
+
+        btns = new Interface.MultiButton({
+          rows:4, columns:4,
+          mode:'contact',
+          onvaluechange: function(row, column, value) {
+            fm.note( 75 + ((this.columns * row)  + column) * 75 );
+          },
+          bounds:[0,.5,1,.5]
+        })
+
+        panel.add(btns)
+
+        panel.childFill = 'green'
+
+          
+          /*
+        button1 = new Interface.Button({
+          mode : 'contact',
+          max:440,
+          label:'440',
+          target:synth, key:'note',
+          bounds:[0,0,.5,.25],
+        })
+
+        button2 = new Interface.Button({
+          mode : 'contact',
+          max:880,
+          label:'880',
+          target:synth, key:'note',
+          bounds:[.5,0,.5,.25],
+        })
+
+        button3 = new Interface.Button({
+          mode : 'contact',
+          max:1320,
+          label:'1320',
+          target:synth, key:'note',
+          bounds:[0,.25,.5,.25],
+        })
+
+        button4 = new Interface.Button({
+          mode : 'contact',
+          max:507,
+          label:'507',
+          target:synth, key:'note',
+          bounds:[.5,.25,.5,.25],
+        })
+
+        sliderAttack = new Interface.Slider({
+          bounds:[0, .5, .5, .25],
+          label: 'attack',
+          isVertical:false,
+          min: 20, max: 44100,
+          target: synth, key:'attack'
+        })
+
+        sliderDecay = new Interface.Slider({
+          bounds:[.5, .5, .5, .25],
+          label: 'decay',      
+          isVertical:false,
+          min: 20, max: 44100,
+          target: synth, key:'decay'
+        })
+
+        sliderAmp = new Interface.Slider({
+          bounds:[0, .75, .5, .25],
+          label: 'amp',      
+          isVertical:false,
+          min: 0, max: 1,
+          target: synth, key:'amp'
+        })
+
+        panel.add(button1,button2,button3,button4, sliderAttack, sliderDecay, sliderAmp);
+
+        /*      
+
+        Gibberish.init();
+
+        sampler = new Gibberish.Sampler({
+          file: "resources/snare.wav",
+          playOnLoad:0,
+        });
+
+        flanger = new Gibberish.Flanger({ input:sampler }).connect();   
+        synth  = new Gibberish.Synth().connect();       
+
+          !function() {
+            var a = new Interface.Panel({  
+                background:"#000", 
+                container:document.querySelector("#buttonPanel") });
+
+            //default button is "toggle"
+            var b = new Interface.Button({ 
+                bounds:[.05,.20,.3,.3], 
+                target:flanger, 
+                key:'rate',
+                label:'toggle' });
+
+            //set mode to 'momentary' - will stay active during mouse down
+            var c = new Interface.Button({ 
+                bounds:[.35,.20,.3,.3],  
+                label:'momentary', 
+                mode:'momentary' });
+
+            //set mode to 'contact' - will briefly activate for a second
+            var d = new Interface.Button({ 
+                bounds:[.65,.20,.3,.3],  
+                label:'contact', 
+                mode:'contact',
+                max: 440,
+                target: synth, 
+                key: 'note',
+            });
+
+            a.background = 'black';
+            a.add(b,c,d);
+          }()
+          */
+      </script>
+      
+</body>
+
+</html>
