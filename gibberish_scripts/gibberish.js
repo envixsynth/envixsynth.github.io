@@ -21,7 +21,7 @@ a = new Gibberish.Sine().connect();`
 /**###Gibberish.audioFiles : property  
 Array. Anytime an audiofile is loaded (normally using the Sampler ugen) the resulting sample buffer is stored in this array so that it can be immediately recalled.
 **/
-/**###Gibberish.callback : property
+/**###Gibberish.callback : property 
 String. Whenever Gibberish performs code generation the resulting callback is stored here.
 **/
 /**###Gibberish.out : property
